@@ -127,7 +127,7 @@ exports.sourceNodes = async ({
 
   const newNodes = []; // Fetch existing strapi nodes
 
-  const existingNodes = getNodes().filter(n => n.internal.owner === `gatsby-source-strapi`); // Touch each one of them
+  const existingNodes = getNodes().filter(n => n.internal.owner === `mg-gatsby-source-strapi`); // Touch each one of them
 
   existingNodes.forEach(node => touchNode(node)); // Merge single and collection types and retrieve create nodes
 
