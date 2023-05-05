@@ -23,7 +23,7 @@ var _normalize = require("./normalize");
  */
 const LAST_FETCHED_KEY = 'timestamp';
 
-exports.onPreInit = () => console.log('Loaded gatsby-source-strapi-plugin');
+exports.onPreInit = () => console.log('Loaded mg-gatsby-source-strapi-plugin');
 
 exports.sourceNodes = async ({
   actions,
@@ -56,7 +56,7 @@ exports.sourceNodes = async ({
     store,
     cache
   };
-  const existingNodes = getNodes().filter(n => n.internal.owner === `gatsby-source-strapi` || n.internal.type === 'File');
+  const existingNodes = getNodes().filter(n => n.internal.owner === `mg-gatsby-source-strapi` || n.internal.type === 'File');
   existingNodes.forEach(n => touchNode(n));
   const endpoints = (0, _helpers.getEndpoints)(pluginOptions, schemas);
   const lastFetched = await cache.get(LAST_FETCHED_KEY);
@@ -150,7 +150,7 @@ exports.sourceNodes = async ({
           updatedAtUTC: updatedAt
         });
       } else if (isPreview && !createNodeManifestIsSupported && !warnOnceForNoSupport) {
-        console.warn(`gatsby-source-strapi: Your version of Gatsby core doesn't support Content Sync (via the unstable_createNodeManifest action). Please upgrade to the latest version to use Content Sync in your site.`);
+        console.warn(`mg-gatsby-source-strapi: Your version of Gatsby core doesn't support Content Sync (via the unstable_createNodeManifest action). Please upgrade to the latest version to use Content Sync in your site.`);
         warnOnceForNoSupport = true;
       }
     }
