@@ -1,11 +1,14 @@
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.makeParentNodeName = exports.getEndpoints = exports.getContentTypeSchema = exports.buildNodesToRemoveMap = exports.buildMapFromData = exports.buildMapFromNodes = void 0;
+
 var _lodash = _interopRequireDefault(require("lodash"));
+
 const buildMapFromNodes = nodes => {
   return nodes.reduce((acc, current) => {
     const {
@@ -18,12 +21,15 @@ const buildMapFromNodes = nodes => {
     if (type.includes('STRAPI__COMPONENT_')) {
       return acc;
     }
+
     if (type.includes('_JSONNODE')) {
       return acc;
     }
+
     if (type.includes('_TEXTNODE')) {
       return acc;
     }
+
     if (type && id && strapi_id) {
       if (acc[type]) {
         acc[type] = [...acc[type], {
@@ -37,17 +43,23 @@ const buildMapFromNodes = nodes => {
         }];
       }
     }
+
     return acc;
   }, {});
 };
+
 exports.buildMapFromNodes = buildMapFromNodes;
+
 const buildMapFromData = (endpoints, data) => {
   const map = {};
+
   for (let i = 0; i < endpoints.length; i++) {
     const {
       singularName
     } = endpoints[i];
+
     const nodeType = _lodash.default.toUpper(`Strapi_${_lodash.default.snakeCase(singularName)}`);
+
     for (let entity of data[i]) {
       if (map[nodeType]) {
         map[nodeType] = [...map[nodeType], {
@@ -60,9 +72,12 @@ const buildMapFromData = (endpoints, data) => {
       }
     }
   }
+
   return map;
 };
+
 exports.buildMapFromData = buildMapFromData;
+
 const buildNodesToRemoveMap = (existingNodesMap, endpoints, data) => {
   const newNodes = buildMapFromData(endpoints, data);
   const toRemoveMap = Object.entries(existingNodesMap).reduce((acc, [name, value]) => {
@@ -72,6 +87,7 @@ const buildNodesToRemoveMap = (existingNodesMap, endpoints, data) => {
     if (!currentNodes) {
       return acc;
     }
+
     acc[name] = value.filter(j => {
       return currentNodes.findIndex(k => k.strapi_id === j.strapi_id) === -1;
     });
@@ -79,14 +95,18 @@ const buildNodesToRemoveMap = (existingNodesMap, endpoints, data) => {
   }, {});
   return toRemoveMap;
 };
+
 exports.buildNodesToRemoveMap = buildNodesToRemoveMap;
+
 const getContentTypeSchema = (schemas, ctUID) => {
   const currentContentTypeSchema = schemas.find(({
     uid
   }) => uid === ctUID);
   return currentContentTypeSchema;
 };
+
 exports.getContentTypeSchema = getContentTypeSchema;
+
 const getEndpoints = ({
   collectionTypes,
   singleTypes
@@ -112,6 +132,7 @@ const getEndpoints = ({
       queryParams,
       queryLimit
     } = options;
+
     if (kind === 'singleType') {
       return {
         singularName,
@@ -123,14 +144,14 @@ const getEndpoints = ({
         }
       };
     }
+
     return {
       singularName,
       pluralName,
       kind,
       uid,
       endpoint: `/api/${pluralName}`,
-      queryParams: {
-        ...(queryParams || {}),
+      queryParams: { ...(queryParams || {}),
         pagination: {
           pageSize: queryLimit || 250,
           page: 1
@@ -141,7 +162,9 @@ const getEndpoints = ({
   });
   return endpoints;
 };
+
 exports.getEndpoints = getEndpoints;
+
 const normalizeConfig = ({
   collectionTypes,
   singleTypes
@@ -150,14 +173,17 @@ const normalizeConfig = ({
     if (_lodash.default.isPlainObject(config)) {
       return config;
     }
+
     return {
       singularName: config
     };
   }).filter(Boolean);
+
   const normalizedCollectionTypes = toSchemaDef(collectionTypes);
   const normalizedSingleTypes = toSchemaDef(singleTypes);
   return [...(normalizedCollectionTypes || []), ...(normalizedSingleTypes || [])];
 };
+
 const makeParentNodeName = (schemas, uid) => {
   const schema = getContentTypeSchema(schemas, uid);
   const {
@@ -168,9 +194,12 @@ const makeParentNodeName = (schemas, uid) => {
   } = schema;
   let nodeName = `Strapi_${_lodash.default.snakeCase(singularName)}`;
   const isComponentType = !['collectionType', 'singleType'].includes(kind);
+
   if (isComponentType) {
     nodeName = `Strapi__Component_${_lodash.default.snakeCase(_lodash.default.replace(uid, '.', '_'))}`;
   }
+
   return _lodash.default.toUpper(nodeName);
 };
+
 exports.makeParentNodeName = makeParentNodeName;

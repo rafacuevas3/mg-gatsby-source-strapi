@@ -1,8 +1,11 @@
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
 var _axios = _interopRequireDefault(require("axios"));
+
 var _lodash = require("lodash");
+
 module.exports = async (entityDefinition, ctx) => {
   const {
     apiURL,
@@ -27,6 +30,7 @@ module.exports = async (entityDefinition, ctx) => {
     headers: addAuthorizationHeader({}, jwtToken)
   };
   reporter.info(`Starting to fetch data from Strapi - ${apiBase} with params ${JSON.stringify(requestOptions.params)}`);
+
   try {
     const {
       data
@@ -42,6 +46,7 @@ module.exports = async (entityDefinition, ctx) => {
  * @param {object} item - Entry needing clean
  * @returns {object} output - Object cleaned
  */
+
 
 const clean = item => {
   (0, _lodash.forEach)(item, (value, key) => {
@@ -62,9 +67,11 @@ const clean = item => {
   });
   return item;
 };
+
 const addAuthorizationHeader = (options, token) => {
   if (token) {
     (0, _lodash.set)(options, 'Authorization', `Bearer ${token}`);
   }
+
   return options;
 };

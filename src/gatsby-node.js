@@ -1,8 +1,11 @@
 "use strict";
 
 var _fetch = require("./fetch");
+
 var _downloadMediaFiles = require("./download-media-files");
+
 var _helpers = require("./helpers");
+
 var _normalize = require("./normalize");
 
 /**
@@ -19,7 +22,9 @@ var _normalize = require("./normalize");
  * See: https://www.gatsbyjs.com/docs/creating-a-local-plugin/#developing-a-local-plugin-that-is-outside-your-project
  */
 const LAST_FETCHED_KEY = 'timestamp';
+
 exports.onPreInit = () => console.log('Loaded gatsby-source-strapi-plugin');
+
 exports.sourceNodes = async ({
   actions,
   createContentDigest,
@@ -62,6 +67,7 @@ exports.sourceNodes = async ({
     if (kind === 'singleType') {
       return (0, _fetch.fetchEntity)(config, ctx);
     }
+
     return (0, _fetch.fetchEntities)(config, ctx);
   }));
   let newOrExistingEntries; // Fetch only the updated data between run
@@ -69,10 +75,8 @@ exports.sourceNodes = async ({
   if (lastFetched) {
     // Add the updatedAt filter
     const deltaEndpoints = endpoints.map(endpoint => {
-      return {
-        ...endpoint,
-        queryParams: {
-          ...endpoint.queryParams,
+      return { ...endpoint,
+        queryParams: { ...endpoint.queryParams,
           // TODO
           filters: {
             updatedAt: {
@@ -89,9 +93,11 @@ exports.sourceNodes = async ({
       if (kind === 'singleType') {
         return (0, _fetch.fetchEntity)(config, ctx);
       }
+
       return (0, _fetch.fetchEntities)(config, ctx);
     }));
   }
+
   const data = newOrExistingEntries || allResults; // Build a map of all nodes with the gatsby id and the strapi_id
 
   const existingNodesMap = (0, _helpers.buildMapFromNodes)(existingNodes); // Build a map of all the parent nodes that should be removed
@@ -117,11 +123,13 @@ exports.sourceNodes = async ({
   });
   let warnOnceForNoSupport = false;
   await cache.set(LAST_FETCHED_KEY, Date.now());
+
   for (let i = 0; i < endpoints.length; i++) {
     const {
       uid
     } = endpoints[i];
     await (0, _downloadMediaFiles.downloadMediaFiles)(data[i], ctx, uid);
+
     for (let entity of data[i]) {
       const nodes = (0, _normalize.createNodes)(entity, ctx, uid);
       await Promise.all(nodes.map(n => actions.createNode(n)));
@@ -132,6 +140,7 @@ exports.sourceNodes = async ({
       const isPreview = process.env.GATSBY_IS_PREVIEW === `true`;
       const createNodeManifestIsSupported = typeof unstable_createNodeManifest === `function`;
       const shouldCreateNodeManifest = isPreview && createNodeManifestIsSupported && mainEntryNode;
+
       if (shouldCreateNodeManifest) {
         const updatedAt = entity.updatedAt;
         const manifestId = `${uid}-${entity.id}-${updatedAt}`;
@@ -146,5 +155,6 @@ exports.sourceNodes = async ({
       }
     }
   }
+
   return;
 };

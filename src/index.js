@@ -1,51 +1,23 @@
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
 var _pluralize = _interopRequireDefault(require("pluralize"));
+
 var _lodash = _interopRequireWildcard(require("lodash"));
+
 var _fetch = _interopRequireDefault(require("./fetch"));
+
 var _nodes = require("./nodes");
+
 var _normalize = _interopRequireDefault(require("./normalize"));
+
 var _authentication = _interopRequireDefault(require("./authentication"));
-function _getRequireWildcardCache(nodeInterop) {
-  if (typeof WeakMap !== "function") return null;
-  var cacheBabelInterop = new WeakMap();
-  var cacheNodeInterop = new WeakMap();
-  return (_getRequireWildcardCache = function (nodeInterop) {
-    return nodeInterop ? cacheNodeInterop : cacheBabelInterop;
-  })(nodeInterop);
-}
-function _interopRequireWildcard(obj, nodeInterop) {
-  if (!nodeInterop && obj && obj.__esModule) {
-    return obj;
-  }
-  if (obj === null || typeof obj !== "object" && typeof obj !== "function") {
-    return {
-      default: obj
-    };
-  }
-  var cache = _getRequireWildcardCache(nodeInterop);
-  if (cache && cache.has(obj)) {
-    return cache.get(obj);
-  }
-  var newObj = {};
-  var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor;
-  for (var key in obj) {
-    if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) {
-      var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null;
-      if (desc && (desc.get || desc.set)) {
-        Object.defineProperty(newObj, key, desc);
-      } else {
-        newObj[key] = obj[key];
-      }
-    }
-  }
-  newObj.default = obj;
-  if (cache) {
-    cache.set(obj, newObj);
-  }
-  return newObj;
-}
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
 const toTypeInfo = (type, {
   single = false
 }) => {
@@ -56,20 +28,25 @@ const toTypeInfo = (type, {
       api: type.api
     };
   }
+
   return {
     endpoint: single ? type : (0, _pluralize.default)(type),
     name: type
   };
 };
+
 const contentTypeToTypeInfo = toTypeInfo;
+
 const singleTypeToTypeInfo = singleType => toTypeInfo(singleType, {
   single: true
 });
+
 const fetchEntities = async (entityDefinition, ctx) => {
   const entities = await (0, _fetch.default)(entityDefinition, ctx);
   await _normalize.default.downloadMediaFiles(entities, ctx);
   return entities;
 };
+
 const addDynamicZoneFieldsToSchema = ({
   type,
   items,
@@ -98,6 +75,7 @@ const addDynamicZoneFieldsToSchema = ({
     createTypes([typeDef]);
   }
 };
+
 exports.sourceNodes = async ({
   store,
   actions,

@@ -1,15 +1,22 @@
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.downloadMediaFiles = exports.downloadFile = void 0;
+
 var _commonmark = require("commonmark");
+
 var _qs = _interopRequireDefault(require("qs"));
+
 var _gatsbySourceFilesystem = require("gatsby-source-filesystem");
+
 var _helpers = require("./helpers");
+
 var _axiosInstance = _interopRequireDefault(require("./axiosInstance"));
+
 const reader = new _commonmark.Parser();
 /**
  * Retrieves all medias from the markdown
@@ -24,18 +31,22 @@ const extractFiles = (text, apiURL) => {
   const parsed = reader.parse(text);
   const walker = parsed.walker();
   let event, node;
+
   while (event = walker.next()) {
     node = event.node; // process image nodes
 
     if (event.entering && node.type === 'image') {
       var _node$firstChild;
+
       let destination;
       const alternativeText = ((_node$firstChild = node.firstChild) === null || _node$firstChild === void 0 ? void 0 : _node$firstChild.literal) || '';
+
       if (/^\//.test(node.destination)) {
         destination = `${apiURL}${node.destination}`;
       } else if (/^http/i.test(node.destination)) {
         destination = node.destination;
       }
+
       if (destination) {
         files.push({
           url: destination,
@@ -45,6 +56,7 @@ const extractFiles = (text, apiURL) => {
       }
     }
   }
+
   return files.filter(Boolean);
 };
 /**
@@ -53,6 +65,7 @@ const extractFiles = (text, apiURL) => {
  * @param {Object} ctx
  * @returns {String} node Id
  */
+
 
 const downloadFile = async (file, ctx) => {
   const {
@@ -78,6 +91,7 @@ const downloadFile = async (file, ctx) => {
     fileNodeID = cacheMediaData.fileNodeID;
     touchNode(getNode(fileNodeID));
   }
+
   if (!fileNodeID) {
     try {
       // full media url
@@ -89,6 +103,7 @@ const downloadFile = async (file, ctx) => {
         createNode,
         createNodeId
       });
+
       if (fileNode) {
         fileNodeID = fileNode.id;
         await cache.set(mediaDataCacheKey, {
@@ -101,6 +116,7 @@ const downloadFile = async (file, ctx) => {
       console.log('err', e);
     }
   }
+
   return fileNodeID;
 };
 /**
@@ -110,7 +126,9 @@ const downloadFile = async (file, ctx) => {
  * @param {String} uid the main schema uid
  */
 
+
 exports.downloadFile = downloadFile;
+
 const extractImages = async (item, ctx, uid) => {
   const {
     schemas,
@@ -121,6 +139,7 @@ const extractImages = async (item, ctx, uid) => {
   const {
     apiURL
   } = strapiConfig;
+
   for (const attributeName of Object.keys(item)) {
     const value = item[attributeName];
     const attribute = schema.schema.attributes[attributeName];
@@ -142,13 +161,16 @@ const extractImages = async (item, ctx, uid) => {
           }, {
             encode: false
           });
+
           const {
             data
           } = await axiosInstance.get(`/api/upload/files?${filters}`);
           const file = data[0];
+
           if (!file) {
             return null;
           }
+
           const fileNodeID = await downloadFile(file, ctx);
           return {
             fileNodeID,
@@ -156,6 +178,7 @@ const extractImages = async (item, ctx, uid) => {
           };
         }));
         const fileNodes = files.filter(Boolean);
+
         for (let i = 0; i < fileNodes.length; i++) {
           item[attributeName].medias.push({
             alternativeText: extractedFiles[i].alternativeText,
@@ -166,11 +189,13 @@ const extractImages = async (item, ctx, uid) => {
           });
         }
       }
+
       if (type === 'dynamiczone') {
         for (const element of value) {
           await extractImages(element, ctx, element.strapi_component);
         }
       }
+
       if (type === 'component') {
         if (attribute.repeatable) {
           for (const element of value) {
@@ -180,6 +205,7 @@ const extractImages = async (item, ctx, uid) => {
           await extractImages(value, ctx, attribute.component);
         }
       }
+
       if (type === 'media') {
         const isMultiple = attribute.multiple;
         const imagesField = isMultiple ? value : [value]; // Dowload all files
@@ -189,6 +215,7 @@ const extractImages = async (item, ctx, uid) => {
           return fileNodeID;
         }));
         const images = files.filter(fileNodeID => fileNodeID);
+
         if (images && images.length > 0) {
           if (isMultiple) {
             for (let i = 0; i < value.length; i++) {
@@ -203,8 +230,10 @@ const extractImages = async (item, ctx, uid) => {
   }
 }; // Downloads media from image type fields
 
+
 const downloadMediaFiles = async (entities, ctx, contentTypeUid) => Promise.all(entities.map(async entity => {
   await extractImages(entity, ctx, contentTypeUid);
   return entity;
 }));
+
 exports.downloadMediaFiles = downloadMediaFiles;
